@@ -1,1 +1,0 @@
-["sbt.Task[scala.collection.immutable.Map[java.lang.String, scala.collection.Seq[scala.Tuple2[java.nio.file.Path, sbt.nio.FileStamp]]]]",{"2.12.9":{"hashes":[["/Users/igorsoto/source/pocs/cake_pattern/src/test/scala/UserServiceSpec.scala","e98e3f52da9b3ec1e100523aafcfb91cc0ef4cc0"]],"lastModifiedTimes":[]}}]
