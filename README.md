@@ -1,0 +1,2 @@
+# scala
+Scala learning repository
