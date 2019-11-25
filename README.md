@@ -12,3 +12,5 @@ Scala learning repository
 ## Books (exercises and examples)
 
 - [Cay S. Horstmann - Scala for the Impatient - 2nd Edition](https://github.com/igorsoto/scala/tree/master/books/scala-for-the-impatient-2-edition)
+
+- [Michael Swaine and the PragPub writers - Functional Programming: A PragPub Anthology](https://github.com/igorsoto/scala/tree/master/books/functional-programming-a-pragpub-anthology)
