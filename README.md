@@ -9,6 +9,8 @@ Scala learning repository
 
 - [Akka HTTP - Chunked Responses](https://github.com/igorsoto/scala/tree/master/akka/http)
 
+- [Slick FRM](https://github.com/igorsoto/scala/tree/master/slick)
+
 ## Books (exercises and examples)
 
 - [Cay S. Horstmann - Scala for the Impatient - 2nd Edition](https://github.com/igorsoto/scala/tree/master/books/scala-for-the-impatient-2-edition)
