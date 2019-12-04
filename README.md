@@ -11,6 +11,8 @@ Scala learning repository
 
 - [Slick FRM](https://github.com/igorsoto/scala/tree/master/slick)
 
+- [Moco Server](https://github.com/igorsoto/scala/tree/master/test/moco)
+
 ## Books (exercises and examples)
 
 - [Cay S. Horstmann - Scala for the Impatient - 2nd Edition](https://github.com/igorsoto/scala/tree/master/books/scala-for-the-impatient-2-edition)
