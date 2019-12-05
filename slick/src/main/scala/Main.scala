@@ -34,8 +34,20 @@ object Main extends App {
 
     val coffees = TableQuery[Coffees]
 
+    class Users(tag: Tag) extends Table[(Int, String, String, String, ZonedDateTime, ZonedDateTime)](tag, "USERS") {
+      def id = column[Int]("ID", O.PrimaryKey)
+      def name = column[String]("NAME")
+      def email = column[String]("EMAIL")
+      def code = column[String]("CODE")
+      def createdAt = column[ZonedDateTime]("CREATED_AT")
+      def updatedAt = column[ZonedDateTime]("UPDATED_AT")
+      def * = (id, name, email, code, createdAt, updatedAt)
+    }
+
+    val users = TableQuery[Users]
+
     val setup = DBIO.seq(
-      (suppliers.schema ++ coffees.schema).create,
+      (suppliers.schema ++ coffees.schema ++ users.schema).create,
 
       suppliers += (101, "Acme, Inc.",      "99 Market Street", "Groundsville", "CA", "95199"),
       suppliers += ( 49, "Superior Coffee", "1 Party Place",    "Mendocino",    "CA", "95460"),
@@ -49,6 +61,12 @@ object Main extends App {
         ("Colombian_Decaf",   101, 8.99, 0, 0),
         ("French_Roast_Decaf", 49, 9.99, 0, 0)
       ),
+
+      users ++= Seq(
+        (1, "Igor", "igor@email.com", "1", ZonedDateTime.now(), ZonedDateTime.now()),
+        (2, "Igor", "igor@email.com", "1", ZonedDateTime.now().plusDays(1), ZonedDateTime.now().plusDays(1)),
+        (3, "Marcelo", "marcelo@email.com", "2", ZonedDateTime.now().plusDays(2), ZonedDateTime.now().plusDays(2)),
+      )
     )
 
     val setupFuture = db.run(setup)
@@ -130,6 +148,20 @@ object Main extends App {
       db.run(deleteAction).map { numDeletedRows =>
         println(s"Deleted $numDeletedRows rows")
       }
+    }.flatMap { _ =>
+      // 8 - Group By and Aggregation
+
+      println("\n\n8 - Group By and Aggregation")
+
+      val groupQuery =
+        users.groupBy(u => (u.name, u.email, u.code))
+        .map {
+          case ((name, email, code), group) =>
+            (group.map(_.id).max, group.map(_.createdAt).max, group.map(_.updatedAt).max, name, email, code)
+        }
+        .result
+
+      db.run(groupQuery).map(println)
     }
 
     Await.result(f, Duration.Inf)
