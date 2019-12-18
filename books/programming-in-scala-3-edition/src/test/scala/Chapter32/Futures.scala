@@ -18,6 +18,13 @@ object Time {
   }
 }
 
+class Test {
+  def test(name: String): Unit = {
+    Thread.sleep(1000)
+    // println(name)
+  }
+}
+
 class Futures extends FlatSpec with Matchers {
   "When creating futures before the for expression" should "run in parallel" in {
     val fut1 = Future { Thread.sleep(1000); 21 + 21 }
@@ -47,5 +54,26 @@ class Futures extends FlatSpec with Matchers {
     })
 
     assert(timeTaken > 2 && timeTaken < 3)
+  }
+
+  "Foo" should "deu" in {
+    val fut1 = Future { new Test().test("fut1") }
+    val fut2 = Future { new Test().test("fut2") }
+    val fut3 = Future { new Test().test("fut3") }
+    val fut4 = Future { new Test().test("fut4") }
+    val fut6 = for {
+      _ <- fut1
+      _ <- fut2
+      _ <- fut3
+      _ <- fut4
+    } yield true
+
+    val timeTaken = Time.code(() => {
+      Await.result(fut6, 10.seconds)
+    })
+
+    println(s"Time taken... ${timeTaken}")
+
+    assert(true)
   }
 }
