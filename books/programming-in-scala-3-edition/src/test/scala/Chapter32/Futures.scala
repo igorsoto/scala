@@ -1,11 +1,9 @@
 package Chapter32
 
 import org.scalatest.{FlatSpec, Matchers}
-
 import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
-import scala.util.Success
 
 object Time {
   def code(block: () => Unit): Double = {
@@ -18,10 +16,10 @@ object Time {
   }
 }
 
-class Test {
+object Test {
   def test(name: String): Unit = {
     Thread.sleep(1000)
-    // println(name)
+    println(name)
   }
 }
 
@@ -57,15 +55,11 @@ class Futures extends FlatSpec with Matchers {
   }
 
   "Foo" should "deu" in {
-    val fut1 = Future { new Test().test("fut1") }
-    val fut2 = Future { new Test().test("fut2") }
-    val fut3 = Future { new Test().test("fut3") }
-    val fut4 = Future { new Test().test("fut4") }
+    val fut1 = Future { Test.test("fut1") }
+    val fut2 = Future { Test.test("fut2") }
     val fut6 = for {
       _ <- fut1
       _ <- fut2
-      _ <- fut3
-      _ <- fut4
     } yield true
 
     val timeTaken = Time.code(() => {
