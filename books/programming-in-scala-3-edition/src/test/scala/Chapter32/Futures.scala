@@ -57,13 +57,13 @@ class Futures extends FlatSpec with Matchers {
   "Foo" should "deu" in {
     val fut1 = Future { Test.test("fut1") }
     val fut2 = Future { Test.test("fut2") }
-    val fut6 = for {
+    val fut3 = for {
       _ <- fut1
       _ <- fut2
     } yield true
 
     val timeTaken = Time.code(() => {
-      Await.result(fut6, 10.seconds)
+      Await.result(fut3, 10.seconds)
     })
 
     println(s"Time taken... ${timeTaken}")
