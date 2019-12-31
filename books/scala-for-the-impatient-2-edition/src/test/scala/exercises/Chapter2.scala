@@ -2,6 +2,8 @@ package exercises
 
 import org.scalatest._
 
+import scala.annotation.tailrec
+
 class Chapter2 extends FlatSpec with Matchers {
   "1. The signum of a number is 1 if the number is positive, -1 if it is negative, and 0 if is zero." should "Write a function that computes this value." in {
     object Positive {
@@ -48,6 +50,46 @@ class Chapter2 extends FlatSpec with Matchers {
     }
 
     matches shouldBe true
+  }
+
+  "5. Write a procedure countdown(n: Int)" should "prints the numbers from n to 0" in {
+    var seq = Seq[Int]()
+    def countdown(n: Int): Unit = seq = n to 0 by -1
+
+    countdown(5)
+
+    seq shouldEqual Seq(5, 4, 3, 2, 1, 0)
+  }
+
+  "6. Write a for loop for" should "computing the product of the Unicode codes of all letters in a string." in {
+    val str: String = "Hello"
+    var product: Long = 1L
+    for (c <- str) product *= c.toLong
+    product shouldEqual 9415087488L
+  }
+
+  "7. Solve the preceding exercise" should "without writing a loop." in {
+    val str: String = "Hello"
+    val product: Long = str.foldLeft(1L)(_*_.toLong)
+    product shouldEqual 9415087488L
+  }
+
+  "8. Write a function product(s: String) that" should "computes the product, as described in the preceding exercises." in {
+    def product(s: String) = s.foldLeft(1L)(_*_.toLong)
+    val str: String = "Hello"
+    product(str) shouldEqual 9415087488L
+  }
+
+  "9. Make the function of the preceding exercise a recursive function" should "be a recursive function" in {
+    @tailrec
+    def product(s: String, p: Long = 1L): Long = {
+      s.headOption match {
+        case Some(head) => product(s.tail, p * head.toLong)
+        case _ => p
+      }
+    }
+    val str: String = "Hello"
+    product(str) shouldEqual 9415087488L
   }
 }
 
