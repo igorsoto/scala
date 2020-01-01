@@ -1,5 +1,7 @@
 package exercises
 
+import java.time.LocalDate
+
 import org.scalatest._
 
 import scala.annotation.tailrec
@@ -91,5 +93,35 @@ class Chapter2 extends FlatSpec with Matchers {
     val str: String = "Hello"
     product(str) shouldEqual 9415087488L
   }
+
+  "10. Write a function that computes x^n, where n is an integer." should "Use the following recursive definition:" +
+    "- x^n = y*y if n is even and positive, where y = x^(n/2)" +
+    "- x^n = x*x^(n-1) if n is odd and positive" +
+    "- x^0 = 1" +
+    "- x^n = 1/x^-n if n is negative" in {
+
+    def pow(x: Double, n: Int): Double = {
+      if (n == 0) 1
+      else if (n % 2 == 0 && n > 0) {
+        val y = pow(x, n / 2)
+        y * y
+      }
+      else if (n % 2 != 0 && n > 0) x * pow(x, n - 1)
+      else pow(1 / x, -n)
+    }
+
+    pow(5, 2) shouldEqual 25
+    pow(2, 3) shouldEqual 8
+    pow(2, -1) shouldEqual 0.5
+    pow(3, 0) shouldEqual 1
+  }
+
+//  "11. Define a string interpolator date so that you can define a java.time.LocalDate" should "interpolate" in {
+//    implicit class DateInterpolator(val sc: StringContext) extends AnyVal {
+//      def date(args: Any*): LocalDate = {
+//
+//      }
+//    }
+//  }
 }
 
