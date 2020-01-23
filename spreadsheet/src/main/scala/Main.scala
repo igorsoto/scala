@@ -1,77 +1,49 @@
 import java.io.FileOutputStream
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
 
-case class User(id: Int, name: String)
-case class Order(id: Int, amount: Double)
+import org.apache.poi.xssf.streaming.SXSSFWorkbook
 
 object Main extends App {
-  def createUsersSheet(workbook: HSSFWorkbook): Unit = {
-    val users = Seq(
-      User(1, "Igor Campos"),
-      User(2, "Marcelo Campos"),
-      User(3, "Leidiane Campos")
-    )
-    val headerColumns = Seq("ID", "NAME")
+  val totalSheets =  args(args.indexWhere(_ == "--sheets") + 1).toInt
+  val totalColumns = args(args.indexWhere(_ == "--columns") + 1).toInt
+  val totalRows = args(args.indexWhere(_ == "--rows") + 1).toInt
 
-    val sheet = workbook.createSheet("Users")
+  def uuid() = java.util.UUID.randomUUID.toString
+
+  def createSheet(workbook: SXSSFWorkbook, name: String): Unit = {
+    val sheet = workbook.createSheet(name)
     val headerRow = sheet.createRow(0)
 
-    headerColumns.zipWithIndex.foreach {
-      case (column, index) => {
-        val cell = headerRow.createCell(index)
-        cell.setCellValue(column)
-      }
+    (1 to totalColumns).foreach { index =>
+      val cell = headerRow.createCell(index - 1)
+      cell.setCellValue(s"COLUMN_$index")
     }
 
-    users.zipWithIndex.foreach {
-      case (user, index) => {
-        val row = sheet.createRow(index + 1)
-        val idCell = row.createCell(0)
-        val nameCell = row.createCell(1)
-        idCell.setCellValue(user.id)
-        nameCell.setCellValue(user.name)
+    (1 to totalRows).foreach { index =>
+      val row = sheet.createRow(index)
+      (0 to totalColumns - 1).foreach { columnIndex =>
+        val cell = row.createCell(columnIndex)
+        cell.setCellValue(columnIndex)
       }
     }
   }
 
-  def createOrdersSheet(workbook: HSSFWorkbook): Unit = {
-    val orders = Seq(
-      Order(1, 1.99),
-      Order(2, 3.20),
-      Order(3, 1999.86)
-    )
-    val headerColumns = Seq("ID", "AMOUNT")
+  val start = System.nanoTime
 
-    val sheet = workbook.createSheet("Orders")
-    val headerRow = sheet.createRow(0)
+  val workbook = new SXSSFWorkbook()
+  workbook.setCompressTempFiles(true)
 
-    headerColumns.zipWithIndex.foreach {
-      case (column, index) => {
-        val cell = headerRow.createCell(index)
-        cell.setCellValue(column)
-      }
-    }
-
-    orders.zipWithIndex.foreach {
-      case (order, index) => {
-        val row = sheet.createRow(index + 1)
-        val idCell = row.createCell(0)
-        val amountCell = row.createCell(1)
-        idCell.setCellValue(order.id)
-        amountCell.setCellValue(order.amount)
-      }
-    }
+  (1 to totalSheets).foreach { index =>
+    createSheet(workbook, s"SHEET$index")
   }
 
-  val workbook = new HSSFWorkbook()
-
-  createUsersSheet(workbook)
-  createOrdersSheet(workbook)
-
-  val fileOut = new FileOutputStream("poi-generated-file.xls")
+  val fileOut = new FileOutputStream(s"${uuid()}.xlsx")
   workbook.write(fileOut)
   fileOut.close()
   workbook.close()
+  workbook.dispose()
 
-  println("End...")
+  val end = System.nanoTime
+  val elapsedTimeInSeconds = (end - start) / 1.0e9
+
+  println(s"Elapsed time (seconds): $elapsedTimeInSeconds")
 }
