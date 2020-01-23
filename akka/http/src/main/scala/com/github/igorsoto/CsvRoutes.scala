@@ -11,11 +11,12 @@ object CsvRoutes {
   val routes: Route =
     pathPrefix("csv") {
       get {
-        val iterator = () => CsvLinesIterable.iterator
-        val chunks: Source[ByteString,_] = Source.fromIterator(iterator)
-        val entity: ResponseEntity = Chunked.fromData(ContentTypes.`text/csv(UTF-8)`, chunks)
-        val httpResponse : HttpResponse = HttpResponse(entity=entity)
-        complete(httpResponse)
+//        val iterator = () => CsvLinesIterable.iterator
+//        val chunks: Source[ByteString,_] = Source.fromIterator(iterator)
+//        val entity: ResponseEntity = Chunked.fromData(ContentTypes.`text/csv(UTF-8)`, chunks)
+//        val httpResponse : HttpResponse = HttpResponse(entity=entity)
+//        complete(httpResponse)
+        getFromFile("poi-generated-file.xls")
       }
     }
 }
