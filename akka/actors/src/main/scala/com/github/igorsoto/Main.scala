@@ -7,23 +7,24 @@ import akka.http.scaladsl.Http
 import akka.http.scaladsl.server.Directives.{complete, get, parameter, pathPrefix}
 import akka.http.scaladsl.server.Route
 import com.github.igorsoto.MessagingActor.SendMessage
-
 import scala.concurrent.duration._
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.blocking
 import scala.language.postfixOps
 import scala.util.Failure
 import scala.util.Success
+import java.util.concurrent.atomic.AtomicInteger
 
 object State {
-  private var requestsCounter: Int = 0
-  private var messagesHandledCounter: Int = 0
-  def getRequestsCounter() = requestsCounter
-  def incrementRequestsCounter() = requestsCounter += 1
-  def getMessagesHandledCounter() = messagesHandledCounter
-  def incrementMessagesHandledCounter() = messagesHandledCounter += 1
+  private val requestsCounter: AtomicInteger = new AtomicInteger(0)
+  private val messagesHandledCounter: AtomicInteger = new AtomicInteger(0)
+  def getRequestsCounter() = requestsCounter.get
+  def incrementRequestsCounter() = requestsCounter.incrementAndGet
+  def getMessagesHandledCounter() = messagesHandledCounter.get
+  def incrementMessagesHandledCounter() = messagesHandledCounter.incrementAndGet
   def reset() = {
-    requestsCounter = 0
-    messagesHandledCounter = 0
+    requestsCounter.set(0)
+    messagesHandledCounter.set(0)
   }
 }
 
@@ -31,21 +32,17 @@ object MessagingActor {
 
   final case class SendMessage(message: String)
 
-  def apply(): Behavior[SendMessage] =
-    Behaviors.setup { _ =>
-      Behaviors.receiveMessage { message =>
-        // println("Message handled: " + message)
-        State.incrementMessagesHandledCounter
-        Behaviors.same
-      }
+  def apply(): Behavior[SendMessage] = Behaviors.receive { (context, message) =>
+    blocking {
+      State.incrementMessagesHandledCounter
     }
+    Behaviors.same
+  }
+
 }
 
-//#main-class
 object Main {
-  //#start-http-server
   private def startHttpServer(routes: Route, system: ActorSystem[_]): Unit = {
-    // Akka HTTP still needs a classic ActorSystem to start
     implicit val classicSystem: akka.actor.ActorSystem = system.toClassic
     import system.executionContext
 
@@ -59,24 +56,24 @@ object Main {
         system.terminate()
     }
   }
-  //#start-http-server
   def main(args: Array[String]): Unit = {
     val messagingActor: ActorSystem[MessagingActor.SendMessage] = ActorSystem(MessagingActor(), "MessagingActor")
     messagingActor.scheduler.scheduleWithFixedDelay(1 second, 1 second){
       () => {
-        println(s"\nRequests: ${State.getRequestsCounter()}")
-        println(s"Messages: ${State.getMessagesHandledCounter()}")
+        println(s"\nRequests: ${State.getMessagesHandledCounter}")
+        println(s"Messages: ${State.getMessagesHandledCounter}")
         State.reset
       }
     }
 
-    //#server-bootstrapping
     val rootBehavior = Behaviors.setup[Nothing] { context =>
       val route: Route =
         pathPrefix("messages") {
           parameter('message) { message =>
             get {
-              State.incrementRequestsCounter
+              blocking {
+                State.incrementRequestsCounter
+              }
               messagingActor ! SendMessage(message)
               complete(s"message $message")
             }
@@ -88,4 +85,3 @@ object Main {
     ActorSystem[Nothing](rootBehavior, "HelloAkkaHttpServer")
   }
 }
-//#main-class
