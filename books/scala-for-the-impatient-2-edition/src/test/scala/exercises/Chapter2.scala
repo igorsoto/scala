@@ -1,9 +1,7 @@
 package exercises
 
 import java.time.LocalDate
-
 import org.scalatest._
-
 import scala.annotation.tailrec
 
 class Chapter2 extends FlatSpec with Matchers {
