@@ -50,4 +50,22 @@ class Chapter18 extends FlatSpec with Matchers {
     newPair.first shouldEqual 2.0
     newPair.second shouldEqual 1
   }
+
+  "Why don't we need a lower bound for the replaceFirst method in Section 18.3, \"Bounds for Type Variables,\" on page 266"  should "replace the first component of a Pair[Person] with a Student." in {
+    class Pair[T](val first: T, val second: T) {
+      def replaceFirst(newFirst: T) = new Pair(newFirst, second)
+    }
+
+    class Person(val name: String)
+    class Student(val fullName: String, val clazz: String) extends Person(name = fullName)
+
+    val pair1 = new Pair(new Person(name = "Igor"), new Person(name = "Marcelo"))
+    val student = new Student(fullName = "Maria", clazz = "15C")
+    val pair2 = pair1.replaceFirst(student)
+
+    pair2.first.name shouldEqual "Maria"
+    student shouldBe a[Person]
+    // We don't need a lower bound because we are replacing a supertype with a derived type
+    // Lower type bounds declare a type to be a supertype of another type. (https://docs.scala-lang.org/tour/lower-type-bounds.html)
+  }
 }
