@@ -1,5 +1,5 @@
 public class RaceCondition {
-    private static Boolean done;
+    private static boolean done;
 
     public static void main(String[] args) throws InterruptedException {
         new Thread(new Runnable() {
